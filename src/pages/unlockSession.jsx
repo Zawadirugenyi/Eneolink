@@ -1,225 +1,150 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button, Input, VStack, FormControl, FormLabel, Box, Heading, useToast, Text } from '@chakra-ui/react';
-import backgroundImage from '../Components/Assets/a-contemporary-master-bedroom-design-with-a-modular-wardrobe.jpg'; 
+import React, { useState, useEffect } from "react";
+import { Box, Flex, IconButton, Image, Text } from "@chakra-ui/react";
+import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
+
+const featuredProducts = [
+  {
+    id: 1,
+    image: "https://via.placeholder.com/600x400?text=Product+1",
+    title: "Featured Product 1",
+    description: "This is the first featured product.",
+  },
+  {
+    id: 2,
+    image: "https://via.placeholder.com/600x400?text=Product+2",
+    title: "Featured Product 2",
+    description: "This is the second featured product.",
+  },
+  {
+    id: 3,
+    image: "https://via.placeholder.com/600x400?text=Product+3",
+    title: "Featured Product 3",
+    description: "This is the third featured product.",
+  },
+  {
+    id: 4,
+    image: "https://via.placeholder.com/600x400?text=Product+4",
+    title: "Featured Product 4",
+    description: "This is the fourth featured product.",
+  },
+  {
+    id: 5,
+    image: "https://via.placeholder.com/600x400?text=Product+5",
+    title: "Featured Product 5",
+    description: "This is the fifth featured product.",
+  },
+];
 
 const BypassCodePage = () => {
-    const [tenantName, setTenantName] = useState('');
-    const [bypassCode, setBypassCode] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [timer, setTimer] = useState(0);
-    const [codeGenerated, setCodeGenerated] = useState(false);
-    const navigate = useNavigate();
-    const toast = useToast();
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-    useEffect(() => {
-        localStorage.removeItem('bypassCode');
-        return () => clearInterval(timer);
-    }, []);
-
-    useEffect(() => {
-        let interval = null;
-        if (codeGenerated && timer > 0) {
-            interval = setInterval(() => {
-                setTimer((prevTimer) => {
-                    if (prevTimer <= 1) {
-                        clearInterval(interval);
-                        setCodeGenerated(false);
-                        toast({
-                            title: 'Bypass Code Expired',
-                            description: 'The bypass code has expired. Please generate a new one.',
-                            status: 'warning',
-                            duration: 5000,
-                            isClosable: true,
-                            position: 'top',
-                            variant: 'subtle'
-                        });
-                        return 0;
-                    }
-                    return prevTimer - 1;
-                });
-            }, 1000);
-        } else if (!codeGenerated) {
-            clearInterval(interval);
-        }
-        return () => clearInterval(interval);
-    }, [timer, codeGenerated, toast]);
-
-    const generateBypassCode = () => {
-        const code = Math.random().toString(36).substring(2, 12);
-        localStorage.setItem('bypassCode', code);
-        setTimer(60);
-        setCodeGenerated(true);
-        toast({
-            title: 'Bypass Code Generated',
-            description: `Your bypass code is ${code}. It will expire in 1 minute.`,
-            status: 'info',
-            duration: 5000,
-            isClosable: true,
-            position: 'top',
-            variant: 'subtle'
-        });
-    };
-
-    const handleSubmit = async () => {
-        setLoading(true);
-        try {
-            const token = '9d9c701809388c23bbb1be95b32ee2612261d668';
-
-            const tenantResponse = await fetch('http://127.0.0.1:8000/api/tenants/check/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Token ${token}`,
-                },
-                body: JSON.stringify({ name: tenantName }),
-            });
-
-            if (!tenantResponse.ok) {
-                throw new Error('Network response was not ok');
-            }
-
-            const tenantResult = await tenantResponse.json();
-
-            if (tenantResult.exists) {
-                const storedCode = localStorage.getItem('bypassCode');
-
-                if (bypassCode === storedCode) {
-                    navigate('/login', {
-                      state: { tenantName },
-                    });
-                } else {
-                    toast({
-                        title: 'Invalid Bypass Code',
-                        description: 'The bypass code you entered is incorrect.',
-                        status: 'error',
-                        duration: 5000,
-                        isClosable: true,
-                        position: 'top',
-                        variant: 'subtle'
-                    });
-                }
-            } else {
-                toast({
-                    title: 'Tenant Not Found',
-                    description: 'The tenant with the provided name does not exist.',
-                    status: 'error',
-                    duration: 5000,
-                    isClosable: true,
-                    position: 'top',
-                    variant: 'subtle'
-                });
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            toast({
-                title: 'Error',
-                description: 'An error occurred while verifying your bypass code.',
-                status: 'error',
-                duration: 5000,
-                isClosable: true,
-                position: 'top',
-                variant: 'subtle'
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const formatTime = (seconds) => {
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${mins}:${secs < 10 ? `0${secs}` : secs}`;
-    };
-
-    return (
-        <Box
-            w="100vw"
-            h="100vh"
-            position="relative" // Position relative for overlay positioning
-            backgroundImage={`url(${backgroundImage})`} // Use imported image
-            backgroundSize="cover"
-            backgroundPosition="center"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            p={4}
-        >
-            {/* Overlay with opacity */}
-            <Box
-                position="absolute"
-                top={0}
-                left={0}
-                w="100%"
-                h="100%"
-                bg="rgba(0, 0, 0, 0.5)" // Semi-transparent black
-                zIndex={1} // Ensure overlay is above the background image
-            />
-            {/* Content */}
-            <Box
-                w={{ base: '100%', md: '80%' }}
-                maxW="md"
-                p={6}
-                borderWidth={1}
-                borderRadius="lg"
-                boxShadow="md"
-                bg="white" // White background for the form
-                zIndex={2} // Ensure form is above the overlay
-            >
-                <Heading mb={6} textAlign="center" fontSize="30px" marginBottom="30px">Bypass Code Verification</Heading>
-                <VStack spacing={4} align="stretch">
-                    <FormControl>
-                        <FormLabel>Tenant</FormLabel>
-                        <Input
-                            type="text"
-                            value={tenantName}
-                            onChange={(e) => setTenantName(e.target.value)}
-                            placeholder="Enter tenant name"
-                        />
-                    </FormControl>
-                    <Button 
-                          marginTop="12px"
-              type="submit" 
-              bg="#073d47"
-              color="white"
-              _hover={{ bg: "#0097b2" }}
-              width="full"
-                        onClick={generateBypassCode}
-                        isDisabled={codeGenerated}
-                    >
-                        Generate Bypass Code
-                    </Button>
-                    {codeGenerated && (
-                        <Text textAlign="center" color="teal.500" fontWeight="bold">
-                            Bypass Code valid for: {formatTime(timer)}
-                        </Text>
-                    )}
-                    <FormControl>
-                        <FormLabel>Enter Bypass Code</FormLabel>
-                        <Input
-                            type="text"
-                            value={bypassCode}
-                            onChange={(e) => setBypassCode(e.target.value)}
-                            placeholder="Enter the bypass code"
-                        />
-                    </FormControl>
-                    <Button
-
-                          marginTop="12px"
-              type="submit" 
-              bg="#0097b2"
-              color="white"
-              _hover={{ bg: "#073d47" }}
-              width="full"
-                        onClick={handleSubmit}
-                        isLoading={loading}
-                    >
-                        Submit
-                    </Button>
-                </VStack>
-            </Box>
-        </Box>
+  const nextSlide = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex === featuredProducts.length - 1 ? 0 : prevIndex + 1
     );
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex === 0 ? featuredProducts.length - 1 : prevIndex - 1
+    );
+  };
+
+  useEffect(() => {
+    const interval = setInterval(nextSlide, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const getSlideStyles = (index) => {
+    const position = (index - currentIndex + featuredProducts.length) % featuredProducts.length;
+
+    if (position === 0) {
+      return {
+        left: "50%",
+        transform: "translateX(-50%) scale(1.2)", // Center larger product
+        zIndex: 3,
+        opacity: 1,
+      };
+    } else if (position === 1) {
+      return {
+        left: "25%",
+        transform: "translateX(-50%) scale(0.85)", // Left product
+        zIndex: 2,
+        opacity: 0.8,
+      };
+    } else if (position === featuredProducts.length - 1) {
+      return {
+        left: "75%",
+        transform: "translateX(-50%) scale(0.85)", // Right product
+        zIndex: 2,
+        opacity: 0.8,
+      };
+    } else {
+      return { display: "none" }; // Hide other products
+    }
+  };
+
+  return (
+    <Box position="relative" w="full" maxW="1200px" mx="auto" overflow="hidden" py={8}>
+      <Flex justify="center" align="center" position="relative" h="400px">
+        {featuredProducts.map((product, index) => (
+          <Box
+            key={product.id}
+            position="absolute"
+            top="50%"
+            style={getSlideStyles(index)}
+            transition="all 0.5s ease"
+            transform="translateY(-50%)"
+          >
+            <Image
+              src={product.image}
+              alt={product.title}
+              w="300px"
+              h="200px"
+              objectFit="cover"
+              borderRadius="md"
+              boxShadow="lg"
+              border="2px solid #ddd"
+            />
+            <Box textAlign="center" mt={2}>
+              <Text fontSize="lg" fontWeight="bold">
+                {product.title}
+              </Text>
+              <Text fontSize="sm">{product.description}</Text>
+            </Box>
+          </Box>
+        ))}
+      </Flex>
+
+      {/* Navigation Buttons */}
+      <IconButton
+        aria-label="Previous"
+        icon={<ChevronLeftIcon />}
+        position="absolute"
+        left="5%"
+        top="50%"
+        transform="translateY(-50%)"
+        size="lg"
+        variant="ghost"
+        colorScheme="blackAlpha"
+        onClick={prevSlide}
+        zIndex={4}
+      />
+      <IconButton
+        aria-label="Next"
+        icon={<ChevronRightIcon />}
+        position="absolute"
+        right="5%"
+        top="50%"
+        transform="translateY(-50%)"
+        size="lg"
+        variant="ghost"
+        colorScheme="blackAlpha"
+        onClick={nextSlide}
+        zIndex={4}
+      />
+    </Box>
+  );
 };
 
 export default BypassCodePage;

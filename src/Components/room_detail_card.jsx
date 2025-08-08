@@ -79,7 +79,7 @@ const RoomDetail = ({ roomDescription }) => {
           <Text mb={4}>Description: {description}</Text>
           <Center>
             <Button colorScheme="teal" width="full">
-              Book Now
+              Reserver Maintenant
             </Button>
           </Center>
         </VStack>

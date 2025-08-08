@@ -18,7 +18,7 @@ const HeroSection = () => {
 
     const handleManageBookingsClick = () => {
         // Redirect to the Django admin panel
-        window.location.href = 'http://127.0.0.1:8000/en/admin/login/';
+        window.location.href = 'http://127.0.0.1:8000/en/admin/';
     };
 
     return (
@@ -48,10 +48,10 @@ const HeroSection = () => {
             {/* Content */}
             <VStack spacing={6} textAlign="center" zIndex={2}>
                 <Heading fontSize={{ base: '3xl', md: '5xl' }} mb={4}>
-                    Welcome to SmartHostelPro
+                    Bienvenue chez EneoLink!
                 </Heading>
                 <Text fontSize={{ base: 'lg', md: 'xl' }} mb={6}>
-               Where Safety and Comfort are Our Responsibility
+               Une Place Pour Tous le Monde
 
                 </Text>
                 <HStack spacing={4} justify="center">
@@ -63,7 +63,7 @@ const HeroSection = () => {
                         _hover={{ bg: buttonHoverColor, color: "white" }}
                         w="full"
                     >
-                        Get Started
+                        Commencer
                     </Button>
                     <Button
                         colorScheme="white"
@@ -73,7 +73,7 @@ const HeroSection = () => {
                         _hover={{ bg: buttonHoverColor, color: "white" }}
                         w="full"
                     >
-                        My Account
+                        Mon Compte
                     </Button>
                     <Button
                         colorScheme="white"
@@ -83,7 +83,7 @@ const HeroSection = () => {
                         _hover={{ bg: buttonHoverColor, color: "white" }}
                         w="full"
                     >
-                        Admin
+                        Administrateur
                     </Button>
                 </HStack>
             </VStack>

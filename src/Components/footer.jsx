@@ -16,9 +16,12 @@ function Footer() {
       width="100%"
     >
       <Box>
-        <Text>© 2024 Smart Hostel Pro </Text>
+        <Text>© 2025 EneoLink </Text>
       </Box>
       <Box>
+         <ChakraLink href="#" mr={4}>
+          zawadirugenyi@gmail.com
+        </ChakraLink>
         <ChakraLink href="#" mr={4}>
           Privacy Policy
         </ChakraLink>

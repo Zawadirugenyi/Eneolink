@@ -1,5 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Box, FormControl, FormLabel, Input, Button, Heading, Alert, AlertIcon, AlertTitle, AlertDescription, CloseButton, VStack } from '@chakra-ui/react';
+import {
+  Box,
+  FormControl,
+  FormLabel,
+  Input,
+  Button,
+  Heading,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription,
+  CloseButton,
+  VStack,
+} from '@chakra-ui/react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import backgroundImage from '../Components/Assets/semmel-tip-1200b.jpg';
@@ -15,7 +28,9 @@ const Booking = () => {
   const [tenantId, setTenantId] = useState(null);
   const [roomId, setRoomId] = useState(null);
 
-  // Extract roomNumber and tenantName from location state
+  // Get today's date for the minimum check-in date
+  const today = new Date().toISOString().split('T')[0]; // Format YYYY-MM-DD
+
   useEffect(() => {
     if (location.state) {
       const { roomNumber, tenantName } = location.state;
@@ -24,7 +39,7 @@ const Booking = () => {
     }
   }, [location.state]);
 
-  // Fetch tenantId based on tenantName
+  // Existing effect to fetch tenant ID...
   useEffect(() => {
     const fetchTenantId = async () => {
       if (tenantName) {
@@ -56,7 +71,7 @@ const Booking = () => {
     fetchTenantId();
   }, [tenantName]);
 
-  // Fetch roomId based on roomNumber
+  // Existing effect to fetch room ID...
   useEffect(() => {
     const fetchRoomId = async () => {
       if (roomNumber) {
@@ -88,7 +103,6 @@ const Booking = () => {
     fetchRoomId();
   }, [roomNumber]);
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!roomId || !tenantId || !checkInDate || !checkOutDate) {
@@ -96,7 +110,6 @@ const Booking = () => {
       return;
     }
 
-    // Check valid date comparison
     const checkIn = new Date(checkInDate);
     const checkOut = new Date(checkOutDate);
     if (isNaN(checkIn) || isNaN(checkOut) || checkIn >= checkOut) {
@@ -142,7 +155,7 @@ const Booking = () => {
   return (
     <Box display="flex" justifyContent="center" mt={10}>
       <Box w="600px" p={6} bg="white" boxShadow="lg" rounded="md" borderWidth="1px" borderRadius="lg" overflow="hidden">
-        <Heading mb={6}>Book a Room</Heading>
+        <Heading mb={6}>Reserver la Maison</Heading>
         {message.text && (
           <Alert status={message.type} mb={4}>
             <AlertIcon />
@@ -156,22 +169,23 @@ const Booking = () => {
           <VStack spacing={4}>
             <FormControl id="room" isRequired>
               <FormLabel>Room Number</FormLabel>
-              <Input type="text" value={roomNumber} readOnly />
+              <Input type="text" value={roomNumber} isReadOnly cursor="not-allowed" bg="gray.200" />
             </FormControl>
             <FormControl id="tenant" isRequired>
               <FormLabel>Tenant Name</FormLabel>
-              <Input type="text" value={tenantName} readOnly />
+              <Input type="text" value={tenantName} isReadOnly cursor="not-allowed" bg="gray.200" />
             </FormControl>
             <FormControl id="check_in_date" isRequired>
               <FormLabel>Check-in Date</FormLabel>
               <Input
                 type="date"
+                min={today} // Set min attribute to today's date
                 value={checkInDate}
                 onChange={(e) => setCheckInDate(e.target.value)}
               />
             </FormControl>
             <FormControl id="check_out_date" isRequired>
-              <FormLabel>Check-out Date</FormLabel>
+              <FormLabel>Expected Vacation Date</FormLabel>
               <Input
                 type="date"
                 value={checkOutDate}
@@ -185,7 +199,7 @@ const Booking = () => {
               _hover={{ bg: "#073d47" }}
               width="full"
             >
-              Create Booking
+              Reverser 
             </Button>
           </VStack>
         </form>
@@ -196,11 +210,15 @@ const Booking = () => {
         height="500px"
         bg="gray.100"
         boxShadow="lg"
-        bgSize="cover"
-        bgPosition="center"
-        style={{ backgroundImage: `url(${backgroundImage})` }}
-        ml={6}
-      />
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        style={{
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}>
+      </Box>
     </Box>
   );
 };

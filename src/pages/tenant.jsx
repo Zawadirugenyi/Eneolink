@@ -1,5 +1,25 @@
 import React, { useState } from 'react';
-import { Box, Button, FormControl, FormLabel, Radio, Input, Select, InputGroup, RadioGroup, Stack, Grid, GridItem, Heading, Alert, AlertIcon, AlertTitle, AlertDescription, CloseButton, useToast } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  FormControl,
+  FormLabel,
+  Radio,
+  Input,
+  Select,
+  InputGroup,
+  RadioGroup,
+  Stack,
+  Grid,
+  GridItem,
+  Heading,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription,
+  CloseButton,
+  useToast
+} from '@chakra-ui/react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
@@ -17,9 +37,12 @@ const Tenant = () => {
     sponsor_contact: '',
     passport_photo: null,
     position: '',
-    countryCode: ''
+    countryCode: '',
+    guardian_contact: '',
+    guardianCountryCode: '' // Separate state for guardian's country code
   });
   const [showCustomCountryCode, setShowCustomCountryCode] = useState(false);
+  const [showCustomGuardianCountryCode, setShowCustomGuardianCountryCode] = useState(false); // State for custom guardian country code
   const [message, setMessage] = useState({ type: '', text: '' });
   const toast = useToast();
   const navigate = useNavigate();
@@ -46,6 +69,17 @@ const Tenant = () => {
         setShowCustomCountryCode(true);
       } else {
         setShowCustomCountryCode(false);
+      }
+    } else if (name === 'guardianCountryCode') { // Handling guardian country code
+      setFormData({
+        ...formData,
+        guardianCountryCode: value
+      });
+      // Show custom input if "Other" is selected
+      if (value === 'other') {
+        setShowCustomGuardianCountryCode(true);
+      } else {
+        setShowCustomGuardianCountryCode(false);
       }
     } else {
       setFormData({
@@ -97,10 +131,12 @@ const Tenant = () => {
         phone_number: '',
         email: '',
         parent: '',
+        guardian_contact: '', // Reset guardian contact
         sponsor_contact: '',
         passport_photo: null,
         position: '',
-        countryCode: ''
+        countryCode: '',
+        guardianCountryCode: '' // Reset guardian country code
       });
 
       // Navigate to booking page with room number and tenant name
@@ -136,33 +172,33 @@ const Tenant = () => {
         <Grid templateColumns="repeat(3, 1fr)" gap={6}>
           <GridItem colSpan={1}>
             <FormControl id="name" isRequired>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>Noms</FormLabel>
               <Input type="text" name="name" value={formData.name} onChange={handleChange} />
             </FormControl>
           </GridItem>
 
           <GridItem colSpan={1}>
             <FormControl id="major" isRequired>
-              <FormLabel>Major</FormLabel>
+              <FormLabel>Profession</FormLabel>
               <Input type="text" name="major" value={formData.major} onChange={handleChange} />
             </FormControl>
           </GridItem>
 
           <GridItem colSpan={1}>
             <FormControl id="admin_number" isRequired>
-              <FormLabel>Admin Number</FormLabel>
+              <FormLabel>ID de Travail</FormLabel>
               <Input type="text" name="admin_number" value={formData.admin_number} onChange={handleChange} />
             </FormControl>
           </GridItem>
 
           <GridItem colSpan={1}>
             <FormControl id="gender" isRequired>
-              <FormLabel>Gender</FormLabel>
+              <FormLabel>Genre</FormLabel>
               <RadioGroup name="gender" value={formData.gender} onChange={(value) => setFormData({ ...formData, gender: value })}>
                 <Stack direction="row">
-                  <Radio value="male">Male</Radio>
-                  <Radio value="female">Female</Radio>
-                  <Radio value="other">Other</Radio>
+                  <Radio value="Male">Male</Radio>
+                  <Radio value="Female">Female</Radio>
+                  <Radio value="Other">Other</Radio>
                 </Stack>
               </RadioGroup>
             </FormControl>
@@ -170,36 +206,36 @@ const Tenant = () => {
 
           <GridItem colSpan={1}>
             <FormControl id="nationality" isRequired>
-              <FormLabel>Nationality</FormLabel>
+              <FormLabel>Nationalité</FormLabel>
               <Select name="nationality" value={formData.nationality} onChange={handleChange}>
                 <option value="">Select Nationality</option>
-                 <option value="DRC">Congolese</option>
-                <option value="kenya">Kenyan</option>
-                <option value="uganda">Ugandan</option>
-                <option value="tanzania">Tanzanian</option>
-                <option value="rwanda">Rwandaise</option>
-                <option value="other">Other</option>
+                <option value="DRC">Congolese</option>
+                <option value="Kenya">Kenyan</option>
+                <option value="Uganda">Ugandan</option>
+                <option value="Tanzania">Tanzanian</option>
+                <option value="Rwanda">Rwandaise</option>
+                <option value="Other">Other</option>
               </Select>
             </FormControl>
           </GridItem>
 
           <GridItem colSpan={1}>
             <FormControl id="passport" isRequired>
-              <FormLabel>National ID/Passport</FormLabel>
+              <FormLabel>Carte d'électeur ID/Passport</FormLabel>
               <Input type="text" name="passport" value={formData.passport} onChange={handleChange} />
             </FormControl>
           </GridItem>
 
           <GridItem colSpan={1}>
             <FormControl id="passport_photo" isRequired>
-              <FormLabel>Passport Photo</FormLabel>
+              <FormLabel>Photo Passeport</FormLabel>
               <Input type="file" name="passport_photo" onChange={handleChange} />
             </FormControl>
           </GridItem>
 
           <GridItem colSpan={1}>
             <FormControl id="phone_number" isRequired>
-              <FormLabel>Phone Number</FormLabel>
+              <FormLabel>Téléphone</FormLabel>
               <InputGroup>
                 <Select
                   name="countryCode"
@@ -225,9 +261,9 @@ const Tenant = () => {
                 <Input
                   type="number"
                   name="phone_number"
+                  placeholder="Phone Number"
                   value={formData.phone_number}
                   onChange={handleChange}
-                  placeholder="Enter phone number"
                 />
               </InputGroup>
             </FormControl>
@@ -242,19 +278,19 @@ const Tenant = () => {
 
           <GridItem colSpan={1}>
             <FormControl id="parent" isRequired>
-              <FormLabel>Guardian Name</FormLabel>
+              <FormLabel>Personne de Réference</FormLabel>
               <Input type="text" name="parent" value={formData.parent} onChange={handleChange} />
             </FormControl>
           </GridItem>
 
           <GridItem colSpan={1}>
-            <FormControl id="phone_number" isRequired>
-              <FormLabel>Guardian Contact</FormLabel>
+            <FormControl id="guardian_contact" isRequired>
+              <FormLabel>PR Télephone</FormLabel>
               <InputGroup>
                 <Select
-                  name="countryCode"
+                  name="guardianCountryCode"
                   width="35%"
-                  value={formData.countryCode}
+                  value={formData.guardianCountryCode}
                   onChange={handleChange}
                 >
                   <option value="+243">+243 (DRC)</option>
@@ -264,20 +300,20 @@ const Tenant = () => {
                   <option value="+250">+250 (Rwanda)</option>
                   <option value="other">Other</option>
                 </Select>
-                {showCustomCountryCode && (
+                {showCustomGuardianCountryCode && (
                   <Input
                     type="text"
-                    name="countryCodeCustom"
-                    placeholder="Enter custom country code"
-                    onChange={(e) => setFormData({ ...formData, countryCode: e.target.value })}
+                    name="guardianCountryCodeCustom"
+                    placeholder="Enter custom guardian country code"
+                    onChange={(e) => setFormData({ ...formData, guardianCountryCode: e.target.value })}
                   />
                 )}
                 <Input
                   type="number"
-                  name="phone_number"
-                  value={formData.phone_number}
+                  name="guardian_contact"
+                  placeholder="Guardian Phone Number"
+                  value={formData.guardian_contact}
                   onChange={handleChange}
-                  placeholder="Enter phone number"
                 />
               </InputGroup>
             </FormControl>
@@ -285,19 +321,28 @@ const Tenant = () => {
 
 
           <GridItem colSpan={1}>
-            <FormControl id="position" isRequired>
-              <FormLabel>Guardian Role</FormLabel>
-              <Input type="text" name="position" value={formData.position} onChange={handleChange} />
+              <FormControl id="Relationship" isRequired>
+              <FormLabel>Relations</FormLabel>
+              <Select name="relationship" value={formData.relationship} onChange={handleChange}>
+                <option value="">Select Relationship</option>
+                <option value="Father">Père</option>
+                <option value="Mother">Mère</option>
+                <option value="Mother">Mari</option>
+                <option value="Mother">Femme</option>
+                <option value="Mother">Ami</option>
+                <option value="Guardian">Guardian</option>
+             
+              </Select>
             </FormControl>
           </GridItem>
         </Grid>
 
-        <Box textAlign="center" mt={6}>
+  
+             <Box textAlign="center" mt={6}>
           <Button type="submit" bg="#0097b2" color="white" width="400px" _hover={{ bg: "#073d47" }}>
             Register
           </Button>
         </Box>
-
       </form>
     </Box>
   );

@@ -18,7 +18,7 @@ function RoomPage() {
           return; // Exit early if hostelName is not defined
         }
 
-        const token = '9d9c701809388c23bbb1be95b32ee2612261d668'; // Use the provided token
+        const token = 'e808ac1af8383c2110db302eb1b4f3a44d8c4e8c'; // Use the provided token
         console.log('Using Token:', token); // Log the token to confirm it's being used
 
         const url = `http://127.0.0.1:8000/api/rooms/?hostel__name=${encodeURIComponent(hostelName)}`;

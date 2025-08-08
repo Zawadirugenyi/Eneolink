@@ -238,7 +238,7 @@ const EventPage = () => {
                       leftIcon={<FaDownload />}
                       disabled={!event.rvp_file}
                     >
-                      {event.rvp_file ? "Download RVP" : "No RVP File"}
+                      {event.rvp_file ? "Get your Ticket" : "No RVP File"}
                     </Button>
                     <IconButton
                       icon={<FaHeart />}

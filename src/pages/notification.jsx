@@ -172,7 +172,7 @@ const NotificationPage = ({ tenant }) => {
               <Text color={notification.read ? 'gray.600' : 'black'}>
                 {notification.message}
               </Text>
-              <Text color="gray.500" marginLeft="63%" fontSize="11px" fontWeight="bold">
+              <Text color="gray.500" marginLeft="60%" fontSize="11px" fontWeight="bold">
                 {new Date(notification.date).toLocaleString()}
               </Text>
             </Box>

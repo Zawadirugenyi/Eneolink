@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Heading, Text, Stack, useBreakpointValue, Image } from '@chakra-ui/react';
-import backgroundImage from '../Components/Assets/logooo.jpeg'; // Replace with your actual image path
+import backgroundImage from '../Components/Assets/TEMPO.png'; // Replace with your actual image path
 
 const AboutUs = () => {
     const imageWidth = useBreakpointValue({ base: '100%', md: '40%' });
@@ -26,7 +26,7 @@ const AboutUs = () => {
                     <Stack direction={{ base: 'column', md: 'row' }} spacing={8}>
                         <Box shadow="md" borderWidth="1px" p={9} h={boxHeight} w={{ base: '100%', md: '34%' }}>
                             <Text fontSize="lg" mb={4}>
-                                Welcome to Smart Hostel Pro! We are dedicated to providing the best accommodation experience for students and professionals.
+                                Welcome to EneoLink! We are dedicated to providing the best accommodation experience for people and professionals.
                                 Our facilities are equipped with modern amenities to ensure your comfort and convenience.
                             </Text>
                         </Box>
@@ -38,7 +38,7 @@ const AboutUs = () => {
                         </Box>
                         <Box shadow="md" borderWidth="1px" p={9} h={boxHeight} w={{ base: '100%', md: '30%' }}>
                             <Text fontSize="lg" mb={4}>
-                                Thank you for choosing Smart Hostel Pro. We look forward to making your stay enjoyable and memorable.
+                                Thank you for choosing EneoLink. We look forward to making your stay enjoyable and memorable.
                             </Text>
                         </Box>
                     </Stack>

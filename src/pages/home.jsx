@@ -10,7 +10,7 @@ function Home() {
   useEffect(() => {
     const fetchHostels = async () => {
       try {
-        const token = '9d9c701809388c23bbb1be95b32ee2612261d668'; 
+        const token = 'e808ac1af8383c2110db302eb1b4f3a44d8c4e8c'; 
         const response = await fetch('http://127.0.0.1:8000/api/hostels/', {
           headers: {
             Authorization: `Token ${token}`,
@@ -44,7 +44,7 @@ function Home() {
 
   return (
     <Box p={4}>
-      <Heading mb={6}>Hostels</Heading>
+      <Heading mb={6}>Resisdences</Heading>
       <Grid 
         templateColumns={{ base: 'repeat(1, 1fr)', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }} 
         gap={4}

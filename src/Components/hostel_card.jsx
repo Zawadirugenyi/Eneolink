@@ -38,7 +38,7 @@ function HostelCard({ id, name, address, image }) {
             _hover={{ bg: "#0097b2", color: "white" }}
             textDecoration="none"
           >
-            View Rooms
+            Voir Les Maisons
           </Button>
         </Flex>
       </Flex>

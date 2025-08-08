@@ -42,7 +42,7 @@ import { FaMoon, FaSun } from 'react-icons/fa';
 import { MdOutlineNotifications, MdOutlineNotificationsNone } from 'react-icons/md';
 import axios from 'axios';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import logo from '../Components/Assets/logo.png';
+import logo from '../Components/Assets/Eneolink.png';
 import NotificationPage from './notification';
 import Chatbot from './chatbot'; // Import Chatbot component
 
@@ -203,55 +203,83 @@ useEffect(() => {
   };
 
   const handleSave = async () => {
-    try {
-      const token = localStorage.getItem('authToken');
-      if (!token) {
-        throw new Error('No authentication token found. Please log in.');
-      }
-
-      const headers = {
-        Authorization: `Token ${token}`,
-        'Content-Type': 'multipart/form-data',
-      };
-
-      const formData = new FormData();
-      formData.append('name', editTenant.name);
-      formData.append('email', editTenant.email);
-      formData.append('phone_number', editTenant.phone_number);
-      formData.append('major', editTenant.major);
-      formData.append('gender', editTenant.gender);
-      formData.append('position', editTenant.position);
-      formData.append('admin_number', editTenant.admin_number);
-      formData.append('nationality', editTenant.nationality);
-      formData.append('parent', editTenant.parent);
-
-      if (editTenant.passport_photo instanceof File) {
-        formData.append('passport_photo', editTenant.passport_photo);
-      } else {
-        console.warn('passport_photo is not a file.');
-      }
-
-      await axios.put(`http://127.0.0.1:8000/api/tenants/${editTenant.id}/`, formData, { headers });
-
-      setTenant(editTenant);
-      onEditClose();
-      toast({
-        title: 'Tenant details updated successfully.',
-        status: 'success',
-        duration: 5000,
-        isClosable: true,
-      });
-    } catch (error) {
-      console.error('Error updating tenant details:', error);
-      toast({
-        title: 'Error updating tenant details.',
-        description: error.response?.data?.detail || error.message,
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
+  try {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      throw new Error('No authentication token found. Please log in.');
     }
-  };
+
+    const headers = {
+      Authorization: `Token ${token}`,
+      'Content-Type': 'multipart/form-data',
+    };
+
+    const formData = new FormData();
+    
+    // Include all fields from the model
+    const fields = [
+      'name',
+      'email',
+      'phone_number',
+      'major',
+      'gender',
+      'relationship',
+      'guardian_contact',  // Changed from sponsor_contact to guardian_contact
+      'admin_number',
+      'nationality',
+      'parent',
+    ];
+
+    fields.forEach(field => {
+      if (editTenant[field]) {
+        formData.append(field, editTenant[field]);
+      } else {
+        console.warn(`${field} is missing.`);
+      }
+    });
+
+    // Check and append passport photo
+    if (editTenant.passport_photo instanceof File) {
+      formData.append('passport_photo', editTenant.passport_photo);
+    } else if (editTenant.passport_photo) {
+      console.warn('passport_photo is not a valid file.');
+    }
+
+    // Log the form data for debugging
+    console.log('Form Data:', formData);
+
+    // Make the PUT request
+    const response = await axios.put(`http://127.0.0.1:8000/api/tenants/${editTenant.id}/`, formData, { headers });
+
+    // Optionally log the response for debugging
+    console.log('Response:', response);
+
+    // Update state and notify success
+    setTenant(editTenant);
+    onEditClose();
+    toast({
+      title: 'Tenant details updated successfully.',
+      status: 'success',
+      duration: 5000,
+      isClosable: true,
+    });
+  } catch (error) {
+    console.error('Error updating tenant details:', error);
+    
+    // Check if error response is available and provide user-friendly messages
+    const errorMessage = error.response?.data?.detail || 'An unexpected error occurred. Please try again.';
+    
+    toast({
+      title: 'Error updating tenant details.',
+      description: errorMessage,
+      status: 'error',
+      duration: 5000,
+      isClosable: true,
+    });
+  }
+};
+
+
 
   const handleRequisitionChange = (e) => {
     const { name, value } = e.target;
@@ -360,15 +388,18 @@ const handleLogout = async () => {
         <VStack
         w="20%"
         h="100vh"
-        bg={sidebarBgColor}
+        bg="White"
         color="white"
         spacing={4}
         align="stretch"
         p={4}
+         borderWidth="1px"
+      overflow="hidden"
+   
       >
         <Image src={logo} alt="Logo" boxSize="100px" mb={4} />
         <Button
-          colorScheme="white" variant="outline"
+          bg={sidebarBgColor} variant="outline"
           _hover={{ bg: buttonHoverColor, color: "white" }}
           w="full"
           onClick={() => setShowCards(!showCards)}
@@ -377,7 +408,7 @@ const handleLogout = async () => {
         </Button>
         <Link to="/">
           <Button
-            colorScheme="white" variant="outline"
+           bg={sidebarBgColor} variant="outline"
             _hover={{ bg: buttonHoverColor, color: "white" }}
             w="full"
           >
@@ -385,7 +416,7 @@ const handleLogout = async () => {
           </Button>
         </Link>
            <Button
-          colorScheme="white" variant="outline"
+          bg={sidebarBgColor} variant="outline"
           _hover={{ bg: buttonHoverColor, color: "white" }}
           w="full"
           onClick={onRequisitionOpen}
@@ -397,7 +428,7 @@ const handleLogout = async () => {
           to={`/event?tenantName=${encodeURIComponent(tenantName)}`}
         >
     <Button
-      colorScheme="white" variant="outline"
+     bg={sidebarBgColor} variant="outline"
       _hover={{ bg: buttonHoverColor, color: "white" }}
       w="full"
     >
@@ -407,7 +438,7 @@ const handleLogout = async () => {
         <Link  to={`/facilities?tenantName=${encodeURIComponent(tenantName)}`}
         >
           <Button
-            colorScheme="white" variant="outline"
+          bg={sidebarBgColor} variant="outline"
             _hover={{ bg: buttonHoverColor, color: "white" }}
             w="full"
           >
@@ -418,7 +449,7 @@ const handleLogout = async () => {
 
         
         <Button
-          colorScheme="white" variant="outline"
+       bg={sidebarBgColor}variant="outline"
           _hover={{ bg: buttonHoverColor, color: "white" }}
           w="full"
           onClick={toggleColorMode}
@@ -493,14 +524,14 @@ const handleLogout = async () => {
                 </CardHeader>
                 <CardBody>
                   <Text>FullName: {tenant.name}</Text>
-                  <Text>Admin Number: {tenant.admin_number}</Text>
                   <Text>Email: {tenant.email}</Text>
-                  <Text>Phone: {tenant.phone_number}</Text>
+                  <Text>Admin Number: {tenant.admin_number}</Text>
                   <Text>Major: {tenant.major}</Text>
                   <Text>Gender: {tenant.gender}</Text>
-                  <Text>Position: {tenant.position}</Text>
+                  <Text>Phone: {tenant.phone_number}</Text>
                   <Text>Nationality: {tenant.nationality}</Text>
-                  <Text>Parent: {tenant.parent}</Text> 
+                  <Text>Guardian Name: {tenant.parent}</Text> 
+                  <Text>Rationship: {tenant.relationship}</Text>
                 </CardBody>
                 <CardFooter>
                   <Button
@@ -515,7 +546,7 @@ const handleLogout = async () => {
     <GridItem>
             <Card>
               <CardHeader>
-                <Text fontSize="lg">Room</Text>
+                <Text fontSize="lg">Maison</Text>
               </CardHeader>
               <CardBody>
                 {room ? (
@@ -534,7 +565,7 @@ const handleLogout = async () => {
             <GridItem>
               <Card>
                 <CardHeader>
-                  <Text fontSize="lg">Booking</Text>
+                  <Text fontSize="lg">Reservation</Text>
                 </CardHeader>
                 <CardBody>
                   <Text>Check-in: {booking.check_in_date}</Text>
@@ -615,17 +646,21 @@ const handleLogout = async () => {
                   value={editTenant.gender || ''}
                   onChange={handleInputChange}
                 >
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
                 </Select>
               </FormControl>
-              <FormControl id="position" mt={4}>
-                <FormLabel>Position</FormLabel>
-                <Input
-                  name="position"
-                  value={editTenant.position || ''}
+                <FormControl id="relationship" mt={4}>
+                <FormLabel>Relationship</FormLabel>
+                <Select
+                  name="Relationship"
+                  value={editTenant.relationship || ''}
                   onChange={handleInputChange}
-                />
+                >
+                  <option value="Father">Father</option>
+                  <option value="Mother">Mother</option>
+                  <option value="Guardian">Guardian</option>
+                </Select>
               </FormControl>
               <FormControl id="admin_number" mt={4}>
                 <FormLabel>Admin Number</FormLabel>
@@ -635,6 +670,24 @@ const handleLogout = async () => {
                   onChange={handleInputChange}
                 />
               </FormControl>
+
+                   <FormControl id="nationality" mt={4}>
+                <FormLabel>Nationality</FormLabel>
+                <Select
+                  name="nationality"
+                  value={editTenant.nationality || ''}
+                  onChange={handleInputChange}
+                >
+                <option value="">Select Nationality</option>
+                <option value="DRC">Congolese</option>
+                <option value="Kenya">Kenyan</option>
+                <option value="Uganda">Ugandan</option>
+                <option value="Tanzania">Tanzanian</option>
+                <option value="Rwanda">Rwandaise</option>
+                <option value="Other">Other</option>
+                </Select>
+              </FormControl>
+
               <FormControl id="nationality" mt={4}>
                 <FormLabel>Nationality</FormLabel>
                 <Input
@@ -643,6 +696,7 @@ const handleLogout = async () => {
                   onChange={handleInputChange}
                 />
               </FormControl>
+
               <FormControl id="parent" mt={4}>
                 <FormLabel>Parent</FormLabel>
                 <Input
@@ -677,7 +731,7 @@ const handleLogout = async () => {
        <Modal isOpen={isRequisitionOpen} onClose={onRequisitionClose}>
   <ModalOverlay />
   <ModalContent>
-    <ModalHeader>Submit Requisition</ModalHeader>
+    <ModalHeader>Envoyer</ModalHeader>
     <ModalCloseButton />
     <ModalBody>
       <FormControl mb={4}>
@@ -728,19 +782,15 @@ const handleLogout = async () => {
       <Button   bg="#0097b2"
               color="white"
               _hover={{ bg: "#073d47" }}onClick={handleRequisitionSubmit}>
-        Submit
+        Confimer
       </Button>
       <Button colorScheme="gray" onClick={onRequisitionClose} ml={3}>
-        Cancel
+        Annuler
       </Button>
     </ModalFooter>
   </ModalContent>
 </Modal>
 
-   {/* Chatbot Component */}
-        <Box position="absolute" bottom="4" right="4">
-          <Chatbot />
-        </Box>
 
       </Flex>
     </Flex>

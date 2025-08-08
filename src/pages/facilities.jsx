@@ -21,8 +21,9 @@ const Facilities = () => {
   const [error, setError] = useState(null);
   const [registrationData, setRegistrationData] = useState({
     facilityId: null,
-    tenantName: '',  // Changed to tenantName
+    tenantName: '',
   });
+  const [loading, setLoading] = useState(true); // Loading state
   const toast = useToast();
   const navigate = useNavigate();
   const { colorMode, toggleColorMode } = useColorMode();
@@ -37,6 +38,7 @@ const Facilities = () => {
 
     if (!tenantNameFromQuery) {
       setError('Tenant name is missing from query parameters.');
+      setLoading(false);
       return;
     }
 
@@ -44,27 +46,23 @@ const Facilities = () => {
       try {
         console.log('Fetching tenant ID...');
         const response = await axios.get(
-          `http://127.0.0.1:8000/api/tenants/?name=${encodeURIComponent(
-            tenantNameFromQuery
-          )}`,
-          {
-            headers: {
-              Authorization: `Token ${authToken}`,
-            },
-          }
+          `http://127.0.0.1:8000/api/tenants/?name=${encodeURIComponent(tenantNameFromQuery)}`,
+          { headers: { Authorization: `Token ${authToken}` } }
         );
         console.log('Tenant Response:', response.data);
         if (response.data.length === 0) {
           setError('Tenant not found.');
-          return;
+        } else {
+          setRegistrationData(prev => ({
+            ...prev,
+            tenantName: tenantNameFromQuery,
+          }));
         }
-        setRegistrationData((prev) => ({
-          ...prev,
-          tenantName: tenantNameFromQuery, // Store tenantName
-        }));
       } catch (err) {
         console.error('Error fetching tenant ID:', err);
         setError(err.message);
+      } finally {
+        setLoading(false); // Set loading to false after fetching
       }
     };
 
@@ -73,17 +71,15 @@ const Facilities = () => {
         console.log('Fetching facilities...');
         const response = await axios.get(
           'http://127.0.0.1:8000/api/facilities/',
-          {
-            headers: {
-              Authorization: `Token ${authToken}`,
-            },
-          }
+          { headers: { Authorization: `Token ${authToken}` } }
         );
         console.log('Facilities Response:', response.data);
         setFacilities(response.data);
       } catch (err) {
         console.error('Error fetching facilities:', err);
         setError(err.message);
+      } finally {
+        setLoading(false); // Set loading to false after fetching
       }
     };
 
@@ -91,71 +87,71 @@ const Facilities = () => {
     fetchFacilities();
   }, [authToken, tenantNameFromQuery]);
 
-const handleRegister = async (facilityId) => {
-  const { tenantName } = registrationData;
+  const handleRegister = async (facilityId) => {
+    const { tenantName } = registrationData;
 
-  console.log('Registering facility with the following data:');
-  console.log('Facility ID:', facilityId);
-  console.log('Tenant Name:', tenantName);
+    console.log('Registering facility with the following data:');
+    console.log('Facility ID:', facilityId);
+    console.log('Tenant Name:', tenantName);
 
-  try {
-    const response = await axios.post(
-      `http://127.0.0.1:8000/api/register_facility/`,
-      {
-        tenant: { name: tenantName },
-        facility: facilityId,
-      },
-      {
-        headers: {
-          Authorization: `Token ${authToken}`,
-        },
+    try {
+      // Fetch the tenant ID
+      const tenantResponse = await axios.get(
+        `http://127.0.0.1:8000/api/tenants/?name=${encodeURIComponent(tenantName)}`,
+        { headers: { Authorization: `Token ${authToken}` } }
+      );
+
+      const fetchedTenantName = tenantResponse.data[0]?.name;
+
+      if (!fetchedTenantName) {
+        throw new Error('Tenant ID not found');
       }
-    );
 
-    console.log('Registration Response:', response.data);
+      const response = await axios.post(
+        `http://127.0.0.1:8000/api/register_facility/`,
+        { tenant: fetchedTenantName, facility: facilityId },
+        { headers: { Authorization: `Token ${authToken}` } }
+      );
 
-    toast({
-      title: 'Registration successful.',
-      description: `You have successfully registered for the facility.`,
-      status: 'success',
-      duration: 5000,
-      isClosable: true,
-    });
+      console.log('Registration Response:', response.data);
 
-    setRegistrationData({ facilityId: null, tenantName: '' });
-  } catch (err) {
-    console.error('Error registering facility:', err);
-    let errorMessage;
-
-    // Check if the error has a response object
-    if (err.response && err.response.data) {
-      errorMessage = err.response.data.detail || JSON.stringify(err.response.data);
-    } else {
-      errorMessage = err.message || String(err);
-    }
-
-    console.log('Error details:', errorMessage);
-
-    if (typeof errorMessage === 'string' && errorMessage.includes('UNIQUE constraint failed')) {
       toast({
-        title: 'Registration failed.',
-        description: 'You are already registered for this facility.',
-        status: 'error',
+        title: 'Registration successful.',
+        description: `You have successfully registered for the facility.`,
+        status: 'success',
         duration: 5000,
         isClosable: true,
       });
-    } else {
-      toast({
-        title: 'Registration failed.',
-        description: `An unexpected error occurred: ${errorMessage}`,
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
+
+      setRegistrationData({ facilityId: null, tenantName: '' });
+    } catch (err) {
+      console.error('Error registering facility:', err);
+      const errorMessage = err.response?.data?.detail || err.message || String(err);
+      console.log('Error details:', errorMessage);
+
+      if (errorMessage.includes('UNIQUE constraint failed')) {
+        toast({
+          title: 'Registration failed.',
+          description: 'You are already registered for this facility.',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: 'Registration failed.',
+          description: `An unexpected error occurred: ${errorMessage}`,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+      }
     }
+  };
+
+  if (loading) {
+    return <div>Loading...</div>; // Display loading state
   }
-};
-
 
   if (error) {
     return <div>Error: {error}</div>;
@@ -215,6 +211,7 @@ const handleRegister = async (facilityId) => {
                   alt={facility.name}
                   boxSize="100%"
                   objectFit="cover"
+                  fallbackSrc="path/to/fallback/image.jpg" // Fallback image if necessary
                 />
               )}
               <Box p="3" flex="1">

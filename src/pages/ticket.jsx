@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import QRCode from 'qrcode';
 import {
-  Box, VStack, Text, Button, HStack, Spacer,
-  Alert, AlertIcon, Image, AlertTitle, AlertDescription, CloseButton, useBreakpointValue,
+  Box, VStack, Text, Button, HStack, Alert, AlertIcon, Image,
+  AlertTitle, AlertDescription, CloseButton, useBreakpointValue,
 } from '@chakra-ui/react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom'; // Import useNavigate
 import { jsPDF } from 'jspdf';
 import backgroundImage from '../Components/Assets/l-intro-1644597197.jpg'; // Import your image
 import logo from '../Components/Assets/logooo.jpeg'; // Ensure logo path is correct
@@ -29,6 +29,7 @@ const Ticket = () => {
   const [token, setToken] = useState(''); // Store the generated token
   const [qrCodeURL, setQrCodeURL] = useState(''); // State for QR Code URL
   const location = useLocation();
+  const navigate = useNavigate(); // Initialize navigate
   const ticketWidth = useBreakpointValue({ base: '100%', md: '600px' }); // Responsive width
 
   useEffect(() => {
@@ -76,107 +77,109 @@ const Ticket = () => {
     The Hostel Management Team
     `;
     setMessage({ type: 'info', text: content });
+
+    // Redirect to home page after generating the ticket
+    navigate("/"); // Redirects to home
   };
 
-const downloadPDF = () => {
-  if (!qrCodeURL) {
-    setMessage({ type: 'error', text: 'QR Code is not generated yet.' });
-    return;
-  }
+  const downloadPDF = () => {
+    if (!qrCodeURL) {
+      setMessage({ type: 'error', text: 'QR Code is not generated yet.' });
+      return;
+    }
 
-  const formattedCheckInDate = formatDate(checkInDate);
-  const formattedCheckOutDate = formatDate(checkOutDate);
-  const doc = new jsPDF();
+    const formattedCheckInDate = formatDate(checkInDate);
+    const formattedCheckOutDate = formatDate(checkOutDate);
+    const doc = new jsPDF();
 
-  // Set up border and card background color (light gray)
-  doc.setFillColor(240, 240, 240);
-  doc.rect(5, 5, 200, 287, 'F'); // Creates a card-like border around the page
+    // Set up border and card background color (light gray)
+    doc.setFillColor(240, 240, 240);
+    doc.rect(5, 5, 200, 287, 'F'); // Creates a card-like border around the page
 
-  // Add a logo to the PDF (top-center)
-  doc.addImage(logo, 'JPEG', 80, 10, 50, 20); // Centered logo
+    // Add a logo to the PDF (top-center)
+    doc.addImage(logo, 'JPEG', 80, 10, 50, 20); // Centered logo
 
-  // Title section (centered, bold)
-  doc.setFontSize(20);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Room Booking Confirmation', 105, 40, { align: 'center' });
 
-  // Introduction (tenant details)
-  doc.setFontSize(12);
-  doc.setFont('helvetica', 'normal');
-  doc.text(20, 60, `Dear ${tenantName},`);
-  doc.text(20, 70, `Thank you for choosing our hostel! We are pleased to confirm your booking.`);
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Room Booking Confirmation', 105, 40, { align: 'center' });
 
-  // Divider line
-  doc.setLineWidth(0.5);
-  doc.line(10, 75, 200, 75);
+    // Introduction (tenant details)
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text(20, 60, `Dear ${tenantName},`);
+    doc.text(20, 70, `Thank you for choosing our hostel! We are pleased to confirm your booking.`);
 
-  // Room Information (centered and formatted)
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(14);
-  doc.text('Room Information', 105, 90, { align: 'center' });
+    // Divider line
+    doc.setLineWidth(0.5);
+    doc.line(10, 75, 200, 75);
 
-  // Room details content
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(12);
-  doc.text(20, 100, `Room Number: ${roomNumber}`);
-  doc.text(20, 110, `Check-in Date: ${formattedCheckInDate}`);
-  doc.text(20, 120, `Check-out Date: ${formattedCheckOutDate}`);
+    // Room Information (centered and formatted)
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.text('Room Information', 105, 90, { align: 'center' });
 
-  // Divider line
-  doc.setLineWidth(0.5);
-  doc.line(10, 130, 200, 130);
+    // Room details content
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(12);
+    doc.text(20, 100, `Room Number: ${roomNumber}`);
+    doc.text(20, 110, `Check-in Date: ${formattedCheckInDate}`);
+    doc.text(20, 120, `Check-out Date: ${formattedCheckOutDate}`);
 
-  // Token Information - Adjusted Position
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(14);
-  doc.text('Your Token Number', 20, 145); // Left-aligned header
+    // Divider line
+    doc.setLineWidth(0.5);
+    doc.line(10, 130, 200, 130);
 
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(12);
-  doc.text(`Token Number: ${token}`, 20, 155);
+    // Token Information - Adjusted Position
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.text('Your Token Number', 20, 145); // Left-aligned header
 
-  // Divider line
-  doc.setLineWidth(0.5);
-  doc.line(10, 165, 200, 165);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(12);
+    doc.text(`Token Number: ${token}`, 20, 155);
 
-  // Conclusion
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(14);
-  doc.text('Important Notes', 105, 180, { align: 'center' });
+    // Divider line
+    doc.setLineWidth(0.5);
+    doc.line(10, 165, 200, 165);
 
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(12);
-  doc.text(20, 190, `This ticket is valid for the duration of your stay. Please present this ticket`);
-  doc.text(20, 200, `along with your token number at the front desk upon arrival.`);
+    // Conclusion
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.text('Important Notes', 105, 180, { align: 'center' });
 
-  // Footer section (final thank you and contact information)
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(12);
-  doc.text(105, 220, 'Thank You!', { align: 'center' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(12);
+    doc.text(20, 190, `This ticket is valid for the duration of your stay. Please present this ticket`);
+    doc.text(20, 200, `along with your token number at the front desk upon arrival.`);
 
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(12);
-  doc.text(20, 230, `We hope you have a pleasant stay. Should you need any assistance,`);
-  doc.text(20, 240, `feel free to contact our support team at any time.`);
+    // Footer section (final thank you and contact information)
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.text(105, 220, 'Thank You!', { align: 'center' });
 
-  doc.text(105, 270, 'Best regards,', { align: 'center' });
-  doc.text(105, 280, 'The Hostel Management Team', { align: 'center' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(12);
+    doc.text(20, 230, `We hope you have a pleasant stay. Should you need any assistance,`);
+    doc.text(20, 240, `feel free to contact our support team at any time.`);
 
-  // Add QR Code at the end of the PDF
-  const qrCodeWidth = 50; // Adjust width
-  const qrCodeHeight = 50; // Adjust height
-  const qrCodeX = 105 - (qrCodeWidth / 2); // Center horizontally
-  const qrCodeY = 250; // Adjust Y position as needed
+    doc.text(105, 270, 'Best regards,', { align: 'center' });
+    doc.text(105, 280, 'The Hostel Management Team', { align: 'center' });
 
-  doc.addImage(qrCodeURL, 'PNG', qrCodeX, qrCodeY, qrCodeWidth, qrCodeHeight); // Adjust positioning and size as needed
+    // Add QR Code at the end of the PDF
+    const qrCodeWidth = 50; // Adjust width
+    const qrCodeHeight = 50; // Adjust height
+    const qrCodeX = 105 - (qrCodeWidth / 2); // Center horizontally
+    const qrCodeY = 250; // Adjust Y position as needed
 
-  // Save the PDF
-  doc.save('room_booking_ticket.pdf');
-};
+    doc.addImage(qrCodeURL, 'PNG', qrCodeX, qrCodeY, qrCodeWidth, qrCodeHeight); // Adjust positioning and size as needed
 
+    // Save the PDF
+    doc.save('room_booking_ticket.pdf');
+  };
 
   return (
-    <HStack spacing={4} align="start" p={4} bgImage={`url(${backgroundImage})`}  position="relative"  bgSize="cover" bgPosition="center" minH="100vh">
+    <HStack spacing={4} align="start" p={4} bgImage={`url(${backgroundImage})`} position="relative" bgSize="cover" bgPosition="center" minH="100vh">
       <Box
         flex="1"
         bg="white"
@@ -197,33 +200,33 @@ const downloadPDF = () => {
             <Text>Token: {token}</Text>
           </Box>
           <Box bg="gray.50" p={4} borderRadius="md" boxShadow="sm">
-            <Text fontSize="lg" fontWeight="bold" mb={2}>Booking Details</Text>
+            <Text fontSize="lg" fontWeight="bold" mb={2}>Room Information</Text>
             <Text>Room Number: {roomNumber}</Text>
-            <Text>Check-in Date: {formatDate(checkInDate)}</Text>
-            <Text>Check-out Date: {formatDate(checkOutDate)}</Text>
+            <Text>Check-in: {formatDate(checkInDate)}</Text>
+            <Text>Expected Vacation Date: {formatDate(checkOutDate)}</Text>
           </Box>
-           {qrCodeURL && (
-              <Image src={qrCodeURL} alt="QR Code" boxSize="150px" marginLeft="35%" mt={4} />
-            )}
-          <HStack spacing={4} justify="space-between" mt={4} >
-            <Button onClick={generateTicket} bg="#073d47"
-              color="white"
-              _hover={{ bg: "#0097b2" }}>Generate Ticket</Button>
-            <Button onClick={downloadPDF}   bg="#073d47"
-              color="white"
-              _hover={{ bg: "#0097b2" }}>Download PDF</Button>
+          {message.text && (
+            <Alert status={message.type} borderRadius="md">
+              <AlertIcon />
+              <AlertTitle>{message.type === 'error' ? 'Error!' : 'Info!'}</AlertTitle>
+              <AlertDescription>{message.text}</AlertDescription>
+              <CloseButton position="absolute" right="8px" top="8px" onClick={() => setMessage({ type: '', text: '' })} />
+            </Alert>
+          )}
+             {qrCodeURL && (
+            <Box marginLeft="219px">
+              <Text fontSize="lg" fontWeight="bold" mb={2}>Your QR Code:</Text>
+              <Image src={qrCodeURL} alt="QR Code" boxSize="100px" />
+            </Box>
+          )}
+          <HStack spacing={4} justifyContent="center">
+            <Button  color="white" bg="#0097b2"onClick={generateTicket} width="150px" _hover={{ bg: "#073d47" }}>Home</Button>
+            <Button  color="white" bg="#073d47" onClick={downloadPDF}_hover={{ bg: "#073d47" }}>Download PDF</Button>
           </HStack>
+       
         </VStack>
-        {message.text && (
-          <Alert status={message.type} mt={4}>
-            <AlertIcon />
-            <AlertTitle mr={2}>{message.type === 'error' ? 'Error!' : 'Success!'}</AlertTitle>
-            <AlertDescription>{message.text}</AlertDescription>
-            <CloseButton position="absolute" right="8px" top="8px" onClick={() => setMessage({ type: '', text: '' })} />
-          </Alert>
-        )}
       </Box>
-     
+    
     </HStack>
   );
 };

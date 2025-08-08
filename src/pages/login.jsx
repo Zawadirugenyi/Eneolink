@@ -122,7 +122,7 @@ const Login = () => {
         boxShadow="lg"
         rounded="md"
       >
-        <Heading mb={6}>Login</Heading>
+        <Heading mb={6}>Connexion</Heading>
         {message.text && (
           <Alert status={message.type} mb={4}>
             <AlertIcon />
@@ -157,12 +157,12 @@ const Login = () => {
               _hover={{ bg: "#073d47" }}
               width="full"
             >
-              Login
+              Connexion
             </Button>
           </VStack>
         </form>
         <Text mt={4} textAlign="center">
-          Don't have an account? <Link to="/signup" color="teal.500">Sign Up</Link>
+          Pas de compte? <Link to="/signup" color="teal.500">Enregistrez Vous</Link>
         </Text>
       </Box>
     </Box>

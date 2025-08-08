@@ -40,7 +40,7 @@ function RoomCard({ number, roomType, image, hostelId, hostelName, isBooked }) {
             textDecoration="none"
             isDisabled={isBooked}
           >
-            {isBooked ? 'Booked' : 'View Description'}
+            {isBooked ? 'Booked' : 'Voir la Description'}
           </Button>
         </Flex>
       </Flex>

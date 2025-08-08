@@ -18,7 +18,7 @@ const RoomDescription = () => {
     useEffect(() => {
         const fetchRoomDescription = async () => {
             try {
-                const token = '9d9c701809388c23bbb1be95b32ee2612261d668'; 
+                const token = 'e808ac1af8383c2110db302eb1b4f3a44d8c4e8c'; 
                 const response = await axios.get(`http://127.0.0.1:8000/api/room-descriptions/`, {
                     params: {
                         room__number: roomNumber,
@@ -49,7 +49,7 @@ const RoomDescription = () => {
 
         const fetchRoomStatus = async () => {
             try {
-                const token = '9d9c701809388c23bbb1be95b32ee2612261d668'; 
+                const token = 'e808ac1af8383c2110db302eb1b4f3a44d8c4e8c'; 
                 const response = await axios.get(`http://127.0.0.1:8000/api/rooms/`, {
                     params: {
                         number: roomNumber,
@@ -178,7 +178,7 @@ const RoomDescription = () => {
                             onClick={handleBookNowClick} // Updated to use handleBookNowClick for redirection
                             isDisabled={!roomStatus} // Disable button if roomStatus is false
                         >
-                            Book Now
+                            Reserver Maintenant
                         </Button>
                     </Box>
                 </Box>
